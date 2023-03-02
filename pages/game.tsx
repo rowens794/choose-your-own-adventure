@@ -36,7 +36,10 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="bg-center bg-cover h-screen w-full min-h-full relative z-20">
+      <main
+        className="bg-center bg-cover min-h-screen w-full relative z-20"
+        style={{ minHeight: "-webkit-fill-available" }}
+      >
         <div className="grid grid-rows-4 h-screen">
           <div className="row-span-3 p-8">
             <p className="text-white mt-8 text-lg leading-8 font-light">
