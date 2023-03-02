@@ -40,8 +40,8 @@ export default function Home() {
         className="bg-center bg-cover min-h-screen w-full relative z-20"
         style={{ minHeight: "-webkit-fill-available" }}
       >
-        <div className="grid grid-rows-4 h-screen">
-          <div className="row-span-3 p-8">
+        <div className="grid grid-rows-3 h-screen">
+          <div className="row-span-2 p-8">
             <p className="text-white mt-8 text-lg leading-8 font-light">
               {gameBoard?.nextPassage}
             </p>
