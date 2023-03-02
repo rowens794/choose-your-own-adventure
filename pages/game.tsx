@@ -3,11 +3,15 @@ import Head from "next/head";
 import { GameBoard } from "../pages/api/getStep";
 
 export default function Home() {
-  const [gameBoard, setGameBoard] = useState<GameBoard | null>({
+  const [gameBoard, setGameBoard] = useState<GameBoard>({
     nextPassage:
       "You don't know what happend.  You remember falling asleep in your bed, your mom tucking you in tighly under your covers.  But now you're far away from home, you can just feel it.  And this room is dark, an unfamiliar.",
     currentTurn: 0,
     userActions: [{ action: "Start Your Nightmare", result: "Game Continues" }],
+    storySummary: [
+      "Turn 1: you remember going to bed at home, but you wake up in a dark unfamiliar room.",
+    ],
+    nextPassageSummary: [],
     gameOver: false,
   });
   const [loading, setLoading] = useState(false);
@@ -50,28 +54,32 @@ export default function Home() {
             </p>
           </div>
           <div className="text-center w-full h-12 flex flex-col gap-4 p-8">
-            {gameBoard?.userActions.map(({ action }) => (
-              <>
-                {loading ? (
-                  <button
-                    key={action}
-                    className="bg-gray-700 text-white text-xl p-4"
-                  >
-                    {action}
-                  </button>
-                ) : (
-                  <button
-                    key={action}
-                    className="bg-fuchsia-900 text-white text-xl p-4"
-                    onClick={() => {
-                      makeRequest(action);
-                    }}
-                  >
-                    {action}
-                  </button>
-                )}
-              </>
-            ))}
+            {gameBoard?.gameOver && (
+              <div>
+                <p className="text-white mt-8 text-lg leading-8 font-light">
+                  Game Over
+                </p>
+              </div>
+            )}
+            {!gameBoard.gameOver &&
+              gameBoard?.userActions.map(({ action }) => (
+                <div key={action}>
+                  {loading ? (
+                    <button className="bg-gray-700 text-white p-4 w-full">
+                      {action}
+                    </button>
+                  ) : (
+                    <button
+                      className="bg-fuchsia-900 text-white p-4 w-full"
+                      onClick={() => {
+                        makeRequest(action);
+                      }}
+                    >
+                      {action}
+                    </button>
+                  )}
+                </div>
+              ))}
           </div>
         </div>
       </main>
