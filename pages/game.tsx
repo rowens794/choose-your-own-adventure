@@ -48,16 +48,16 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main
-        className="bg-center bg-cover h-[calc(100%-200px)] w-full relative z-20"
+        className="bg-center bg-cover h-[calc(100%-100px)] overflow-y-hidden w-full relative z-20"
         style={{ minHeight: "-webkit-fill-available" }}
       >
-        <div className="h-screen flex flex-col">
+        <div className="h-[calc(100%-100px)] flex flex-col">
           {/*@ts-ignore*/}
           <img src="/flurish.svg" className="pt-8 px-8 opacity-90" />
           <div className="flex justify-between flex-col flex-grow h-full overflow-hidden">
             {/*Main Content Window*/}
             <div
-              className={`max-h-full z-20 relative overflow-scroll h-[calc(100%-200px)] flex justify-between flex-col transform transition-transform duration-300 bg-black  ${
+              className={`max-h-full z-20 overflow-y-hidden relative overflow-scroll h-[calc(100%-100px)] flex justify-between flex-col transform transition-transform duration-300 bg-black  ${
                 loading && " translate-x-full"
               }`}
             >
