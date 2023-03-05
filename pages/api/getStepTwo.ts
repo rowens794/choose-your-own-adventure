@@ -77,7 +77,6 @@ const makeRequest = async (
         //remove black space from beginning of string and end of string
         string = string.trim();
         const obj = JSON.parse(string);
-        console.log(obj);
 
         resolve(obj);
       })

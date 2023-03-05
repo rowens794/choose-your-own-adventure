@@ -71,16 +71,16 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main
-        className="bg-center bg-cover max-w-sm mx-auto overflow-y-hidden w-full relative z-20"
+        className="bg-center bg-cover max-w-sm mx-auto w-full relative z-20"
         style={{ height: "var(--height)" }}
       >
-        <div className="h-screen flex flex-col">
+        <div className="flex flex-col h-full scrollbar-hide">
           {/*@ts-ignore*/}
           <img src="/flurish.svg" className="py-8 px-8 opacity-90" />
-          <div className="flex justify-between flex-col flex-grow h-full overflow-hidden">
+          <div className="flex justify-between flex-col flex-grow h-full overflow-x-hidden">
             {/*Main Content Window*/}
             <div
-              className={`max-h-full z-20 overflow-y-hidden relative overflow-scroll h-full   flex-col transform transition-transform duration-300 bg-black  ${
+              className={`z-20 relative scrollbar-hide overflow-scroll h-full flex-col transform transition-transform duration-300 bg-black  ${
                 loading && " translate-x-full"
               }`}
             >

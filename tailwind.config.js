@@ -15,5 +15,5 @@ module.exports = {
       custom: ["Glook", "serif"],
     },
   },
-  plugins: [],
+  plugins: [require("tailwind-scrollbar-hide")],
 };
