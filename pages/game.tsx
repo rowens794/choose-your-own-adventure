@@ -11,13 +11,14 @@ export default function Home() {
       "You don't know what happend.  You remember falling asleep in your bed, your mom tucking you in tighly under your covers.  But now you're far away from home, you can just feel it.  And this room is dark, and unfamiliar.",
     currentTurn: 0,
     userActions: ["Figure out your next step"],
-    storySummary: [
-      "Turn 1: you remember going to bed at home, but you wake up in a dark unfamiliar room.",
-    ],
     nextPassageSummary: [],
     gameOver: false,
     gameStatus: "playing",
   });
+  const [summary, setSummary] = useState([
+    '"Turn 1: you remember going to bed at home, but you wake up in a dark unfamiliar room."',
+  ]);
+  const [gameTurn, setGameTurn] = useState(1);
   const [loading, setLoading] = useState(false);
 
   //make a request to the getStep endpoint
@@ -32,9 +33,19 @@ export default function Home() {
       body: JSON.stringify({
         userChoice: choice,
         previousGameBoard: gameBoard,
+        storySummary: summary,
       }),
     });
     const { data } = await response.json();
+
+    //update the summary
+    let updatedSummary = [...summary];
+    updatedSummary.push(data.nextPassageSummary);
+    setSummary(updatedSummary);
+
+    //update game turn
+    setGameTurn(gameTurn + 1);
+
     setGameBoard(data);
     setLoading(false);
   };
@@ -51,60 +62,84 @@ export default function Home() {
         className="bg-center bg-cover h-[calc(100%-100px)] overflow-y-hidden w-full relative z-20"
         style={{ minHeight: "-webkit-fill-available" }}
       >
-        <div className="h-[calc(100%-100px)] flex flex-col">
+        <div className="h-screen flex flex-col">
           {/*@ts-ignore*/}
-          <img src="/flurish.svg" className="pt-8 px-8 opacity-90" />
+          <img src="/flurish.svg" className="py-8 px-8 opacity-90" />
           <div className="flex justify-between flex-col flex-grow h-full overflow-hidden">
             {/*Main Content Window*/}
             <div
-              className={`max-h-full z-20 overflow-y-hidden relative overflow-scroll h-[calc(100%-100px)] flex justify-between flex-col transform transition-transform duration-300 bg-black  ${
+              className={`max-h-full z-20 overflow-y-hidden relative overflow-scroll h-full   flex-col transform transition-transform duration-300 bg-black  ${
                 loading && " translate-x-full"
               }`}
             >
-              {/*Game Text*/}
-              <div className="p-8">
-                <p className="text-gray-50 font-custom text-lg leading-8 font-light">
-                  {gameBoard?.nextPassage}
-                </p>
-              </div>
-
-              {/*Buttons*/}
-              <div className="text-center w-full flex flex-col gap-4 p-8">
-                {gameBoard?.gameStatus === "captured" && (
-                  <div>
-                    <p className="text-gray-900 mt-8 text-lg leading-8 font-light">
-                      You&apos;ve been Captured by the Ghosts!
-                    </p>
-                  </div>
-                )}
-                {gameBoard?.gameStatus === "victory" && (
-                  <div>
-                    <p className="text-gray-900 mt-8 text-lg leading-8 font-light">
-                      You&apos;ve Escaped the Manor!
-                    </p>
-                  </div>
-                )}
-                {gameBoard?.gameStatus === "playing" &&
-                  gameBoard?.userActions.map((action) => (
-                    <Button
-                      key={action}
-                      label={action}
-                      clickHandler={() => makeRequest(action)}
-                      active={!loading}
-                    />
-                  ))}
-              </div>
-            </div>
-
-            <div className="absolute top-1/4 z-10 w-full">
-              <img
-                src="/pencil-draw.gif"
-                className="w-48 h-48 invert mx-auto"
+              <GameText gameBoard={gameBoard} />
+              <GameButtons
+                gameBoard={gameBoard}
+                makeRequest={makeRequest}
+                loading={loading}
               />
             </div>
+
+            <LoadingIcon />
           </div>
         </div>
       </main>
     </>
   );
 }
+
+const GameText = ({ gameBoard }: { gameBoard: GameBoard }) => {
+  return (
+    <div className="p-8">
+      <p className="text-gray-50 font-custom text-lg leading-8 font-light">
+        {gameBoard?.nextPassage}
+      </p>
+    </div>
+  );
+};
+
+const GameButtons = ({
+  gameBoard,
+  makeRequest,
+  loading,
+}: {
+  gameBoard: GameBoard;
+  makeRequest: Function;
+  loading: boolean;
+}) => {
+  return (
+    <div className="text-center w-full flex flex-col gap-4 p-8">
+      {gameBoard?.gameStatus === "captured" && (
+        <div>
+          <p className="text-gray-900 mt-8 text-lg leading-8 font-light">
+            You&apos;ve been Captured by the Ghosts!
+          </p>
+        </div>
+      )}
+      {gameBoard?.gameStatus === "victory" && (
+        <div>
+          <p className="text-gray-900 mt-8 text-lg leading-8 font-light">
+            You&apos;ve Escaped the Manor!
+          </p>
+        </div>
+      )}
+      {gameBoard?.gameStatus === "playing" &&
+        gameBoard?.userActions.map((action) => (
+          <Button
+            key={action}
+            label={action}
+            clickHandler={() => makeRequest(action)}
+            active={!loading}
+          />
+        ))}
+    </div>
+  );
+};
+
+const LoadingIcon = () => {
+  return (
+    <div className="absolute top-1/4 z-10 w-full">
+      <img src="/pencil-draw.gif" className="w-48 h-48 invert mx-auto" />
+    </div>
+  );
+};

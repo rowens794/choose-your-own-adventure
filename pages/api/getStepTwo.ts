@@ -6,7 +6,6 @@ export type GameBoard = {
   gameOver: boolean;
   nextPassage: string;
   nextPassageSummary: string[];
-  storySummary: string[];
   userActions: string[];
   gameStatus: "playing" | "captured" | "victory";
 };
@@ -18,6 +17,7 @@ type Data = {
 type RequestBody = {
   userChoice: string;
   previousGameBoard: GameBoard;
+  storySummary: string;
 };
 
 export default async function handler(
@@ -25,22 +25,23 @@ export default async function handler(
   res: NextApiResponse<Data>
 ) {
   let body: RequestBody = req.body;
-  let { userChoice, previousGameBoard } = body;
+  let { userChoice, previousGameBoard, storySummary } = body;
 
   //update the storySummary
-  previousGameBoard.storySummary = [
-    ...previousGameBoard.storySummary,
-    ...previousGameBoard.nextPassageSummary,
-  ];
   let startTime = Date.now();
-  const response = await makeRequest(userChoice, previousGameBoard);
+  const response = await makeRequest(
+    userChoice,
+    previousGameBoard,
+    storySummary
+  );
   console.log("Time to make request: ", Date.now() - startTime);
   res.status(200).json({ data: response });
 }
 
 const makeRequest = async (
   userChoice: string,
-  previousGameBoard: GameBoard
+  previousGameBoard: GameBoard,
+  storySummary: string
 ): Promise<GameBoard> => {
   return new Promise((resolve, reject) => {
     const requestOptions = {
@@ -53,7 +54,10 @@ const makeRequest = async (
         model: "gpt-3.5-turbo",
         messages: [
           { role: "system", content: buildSystemPrompt() },
-          { role: "user", content: buildPrompt(userChoice, previousGameBoard) },
+          {
+            role: "user",
+            content: buildPrompt(userChoice, storySummary, previousGameBoard),
+          },
         ],
         temperature: 0.7,
         top_p: 1,
@@ -73,6 +77,8 @@ const makeRequest = async (
         //remove black space from beginning of string and end of string
         string = string.trim();
         const obj = JSON.parse(string);
+        console.log(obj);
+
         resolve(obj);
       })
       .catch((error) => {
@@ -105,10 +111,8 @@ const buildSystemPrompt = () => {
     {
     nextPassage: the next passage of the story, 
     nextPassageSummary: a summary of the next passage of the story,
-    currentTurn: the current turn (which increments by one each turn), 
     userActions: a list of 2 new actions that the user could take, 
     inventory: a list of the keys collected,
-    storySummary: a summary of the story so far,
     gameStatus: an indicator that takes one of three values: "playing" if the game is to continue on, "captured" if a ghost has captured the player, or "victory" if the player has escaped from the mansion.
     }
 
@@ -120,16 +124,18 @@ const buildSystemPrompt = () => {
 
     The userActions variable should be a list of 2 new actions that a user can take. The userAction variable should be a json array with two strings describing the actions a user can take.  Each string should be less than 8 words. 
 
-    The storySummary variable is an array of bullet points describing the major events of the story so far.  This variable is just for you so that you can keep track of the story and make sure that it is coherent.  After each turn, the storySummary should append a summary of the currentTurn to the storySummary array.  It is important that you take special note of any reference to keys inside the story summary, especially the location of keys.
-
     After each turn, you should evaluate the status of the game.
 `;
 };
 
-const buildPrompt = (userChoice: string, previousGameBoard: GameBoard) => {
+const buildPrompt = (
+  userChoice: string,
+  storySummary: string,
+  previousGameBoard: GameBoard
+) => {
   return `
     Current Turn: ${previousGameBoard.currentTurn + 1}
-    storySummary: ${previousGameBoard.storySummary}
+    storySummary: ${storySummary}
     Last Story Passage: ${previousGameBoard.nextPassage}
     User Choice: ${userChoice}
   `;
