@@ -1,18 +1,22 @@
 import { useState } from "react";
 import Head from "next/head";
-import { GameBoard } from "../pages/api/getStep";
+import Image from "next/image";
+
+import { GameBoard } from "../pages/api/getStepTwo";
+import Button from "../components/button";
 
 export default function Home() {
   const [gameBoard, setGameBoard] = useState<GameBoard>({
     nextPassage:
-      "You don't know what happend.  You remember falling asleep in your bed, your mom tucking you in tighly under your covers.  But now you're far away from home, you can just feel it.  And this room is dark, an unfamiliar.",
+      "You don't know what happend.  You remember falling asleep in your bed, your mom tucking you in tighly under your covers.  But now you're far away from home, you can just feel it.  And this room is dark, and unfamiliar.",
     currentTurn: 0,
-    userActions: [{ action: "Start Your Nightmare", result: "Game Continues" }],
+    userActions: ["Figure out your next step"],
     storySummary: [
       "Turn 1: you remember going to bed at home, but you wake up in a dark unfamiliar room.",
     ],
     nextPassageSummary: [],
     gameOver: false,
+    gameStatus: "playing",
   });
   const [loading, setLoading] = useState(false);
 
@@ -20,7 +24,7 @@ export default function Home() {
   const makeRequest = async (choice: string) => {
     //create a post request with the choice in the body
     setLoading(true);
-    const response = await fetch("/api/getStep", {
+    const response = await fetch("/api/getStepTwo", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -47,39 +51,57 @@ export default function Home() {
         className="bg-center bg-cover min-h-screen w-full relative z-20"
         style={{ minHeight: "-webkit-fill-available" }}
       >
-        <div className="min-h-screen">
-          <div className="p-8">
-            <p className="text-white mt-8 text-lg leading-8 font-light">
-              {gameBoard?.nextPassage}
-            </p>
-          </div>
-          <div className="text-center w-full h-12 flex flex-col gap-4 p-8">
-            {gameBoard?.gameOver && (
-              <div>
-                <p className="text-white mt-8 text-lg leading-8 font-light">
-                  Game Over
+        <div className="h-screen flex flex-col">
+          {/*@ts-ignore*/}
+          <img src="/flurish.svg" className="pt-8 px-8 opacity-90" />
+          <div className="flex justify-between flex-col flex-grow h-full overflow-hidden">
+            {/*Main Content Window*/}
+            <div
+              className={`max-h-full z-20 relative overflow-scroll h-full flex justify-between flex-col transform transition-transform duration-300 bg-black  ${
+                loading && " translate-x-full"
+              }`}
+            >
+              {/*Game Text*/}
+              <div className="p-8">
+                <p className="text-gray-50 font-custom text-lg leading-8 font-light">
+                  {gameBoard?.nextPassage}
                 </p>
               </div>
-            )}
-            {!gameBoard.gameOver &&
-              gameBoard?.userActions.map(({ action }) => (
-                <div key={action}>
-                  {loading ? (
-                    <button className="bg-gray-700 text-white p-4 w-full">
-                      {action}
-                    </button>
-                  ) : (
-                    <button
-                      className="bg-fuchsia-900 text-white p-4 w-full"
-                      onClick={() => {
-                        makeRequest(action);
-                      }}
-                    >
-                      {action}
-                    </button>
-                  )}
-                </div>
-              ))}
+
+              {/*Buttons*/}
+              <div className="text-center w-full flex flex-col gap-4 p-8">
+                {gameBoard?.gameStatus === "captured" && (
+                  <div>
+                    <p className="text-gray-900 mt-8 text-lg leading-8 font-light">
+                      You&apos;ve been Captured by the Ghosts!
+                    </p>
+                  </div>
+                )}
+                {gameBoard?.gameStatus === "victory" && (
+                  <div>
+                    <p className="text-gray-900 mt-8 text-lg leading-8 font-light">
+                      You&apos;ve Escaped the Manor!
+                    </p>
+                  </div>
+                )}
+                {gameBoard?.gameStatus === "playing" &&
+                  gameBoard?.userActions.map((action) => (
+                    <Button
+                      key={action}
+                      label={action}
+                      clickHandler={() => makeRequest(action)}
+                      active={!loading}
+                    />
+                  ))}
+              </div>
+            </div>
+
+            <div className="absolute top-1/4 z-10 w-full">
+              <img
+                src="/pencil-draw.gif"
+                className="w-48 h-48 invert mx-auto"
+              />
+            </div>
           </div>
         </div>
       </main>

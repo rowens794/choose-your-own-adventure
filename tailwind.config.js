@@ -1,3 +1,5 @@
+const plugin = require("tailwindcss/plugin");
+
 module.exports = {
   content: [
     "./app/**/*.{js,ts,jsx,tsx}",
@@ -9,6 +11,9 @@ module.exports = {
   ],
   theme: {
     extend: {},
+    fontFamily: {
+      custom: ["Glook", "serif"],
+    },
   },
   plugins: [],
 };
