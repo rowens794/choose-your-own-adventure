@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Head from "next/head";
 import Image from "next/image";
 
@@ -50,6 +50,18 @@ export default function Home() {
     setLoading(false);
   };
 
+  //setWindow height
+  useEffect(() => {
+    // add an event listener to set the css style property --height to the window height
+    const setHeight = () => {
+      document.documentElement.style.setProperty(
+        "--height",
+        `${window.innerHeight}px`
+      );
+    };
+    setHeight();
+  }, []);
+
   return (
     <>
       <Head>
@@ -59,8 +71,8 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main
-        className="bg-center bg-cover h-[calc(100%-100px)] max-w-sm mx-auto overflow-y-hidden w-full relative z-20"
-        style={{ minHeight: "-webkit-fill-available" }}
+        className="bg-center bg-cover max-w-sm mx-auto overflow-y-hidden w-full relative z-20"
+        style={{ height: "var(--height)" }}
       >
         <div className="h-screen flex flex-col">
           {/*@ts-ignore*/}
