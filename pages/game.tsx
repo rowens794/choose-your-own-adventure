@@ -59,7 +59,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main
-        className="bg-center bg-cover h-[calc(100%-100px)] overflow-y-hidden w-full relative z-20"
+        className="bg-center bg-cover h-[calc(100%-100px)] max-w-sm mx-auto overflow-y-hidden w-full relative z-20"
         style={{ minHeight: "-webkit-fill-available" }}
       >
         <div className="h-screen flex flex-col">
